@@ -8,9 +8,6 @@ services:
   proxy:
     image: nginx:1-alpine
     ports:
-      # actual and only port facing any connection from outside
-      # Note, change the left number if port 1236 is already in use on your system
-      # You could use port 80 if you won't use a reverse proxy
       - "1236:1236"
       - "8536:8536"
     volumes:
@@ -28,7 +25,7 @@ services:
     hostname: lemmy
     restart: unless-stopped
     environment:
-      - RUST_LOG=warn,extism=info,lemmy_server=debug,lemmy_api=debug,lemmy_api_common=debug,lemmy_api_crud=debug,lemmy_apub=debug,lemmy_db_schema=debug,lemmy_db_views=debug,lemmy_routes=debug,lemmy_utils=debug,lemmy_websocket=debug
+      - RUST_LOG=warn
       - LEMMY_DISABLE_ACTIVITY_SENDING=true
     volumes:
       - ./lemmy.hjson:/config/config.hjson:Z
@@ -39,21 +36,10 @@ services:
     logging: *default-logging
 
   lemmy-ui:
-    # use "image" to pull down an already compiled lemmy-ui. make sure to comment out "build".
     image: dessalines/lemmy-ui:nightly
-    # platform: linux/x86_64 # no arm64 support. uncomment platform if using m1.
-    # use "build" to build your local lemmy ui image for development. make sure to comment out "image".
-    # run: docker compose up --build
-
-    # build:
-    #   context: ../../lemmy-ui # assuming lemmy-ui is cloned besides lemmy directory
-    #   dockerfile: dev.dockerfile
     environment:
-      # this needs to match the hostname defined in the lemmy service
       - LEMMY_UI_BACKEND=lemmy:8536
-      # set the outside hostname here
       - LEMMY_UI_HTTPS=false
-      - LEMMY_UI_ERUDA=true
     depends_on:
       - lemmy
     restart: unless-stopped
@@ -62,13 +48,9 @@ services:
 
   pictrs:
     image: asonix/pictrs:0.5
-    # this needs to match the pictrs url in lemmy.hjson
     hostname: pictrs
-    # we can set options to pictrs like this, here we set max. image size and forced format for conversion
-    # entrypoint: /sbin/tini -- /usr/local/bin/pict-rs -p /mnt -m 4 --image-format webp
     environment:
-      - PICTRS_OPENTELEMETRY_URL=http://otel:4137
-      - PICTRS__SERVER__API_KEY=my-pictrs-key
+      - PICTRS__SERVER__API_KEY=CHANGE_ME_PICTRS_KEY
       - PICTRS__MEDIA__VIDEO_CODEC=vp9
       - PICTRS__MEDIA__GIF__MAX_WIDTH=256
       - PICTRS__MEDIA__GIF__MAX_HEIGHT=256
@@ -82,20 +64,14 @@ services:
 
   postgres:
     image: pgautoupgrade/pgautoupgrade:18-alpine
-    # this needs to match the database host in lemmy.hson
-    # Tune your settings via
-    # https://pgtune.leopard.in.ua/#/
-    # You can use this technique to add them here
-    # https://stackoverflow.com/a/30850095/1655478
     hostname: postgres
     command: postgres -c config_file=/etc/postgresql.conf
     ports:
-      # use a different port so it doesn't conflict with potential postgres db running on the host
       - "5433:5432"
     environment:
-      - POSTGRES_USER=lemmy
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=lemmy
+      - POSTGRES_USER=chozi
+      - POSTGRES_PASSWORD=CHANGE_ME_DB_PASSWORD
+      - POSTGRES_DB=chozi
     volumes:
       - ./volumes/postgres:/var/lib/postgresql:Z
       - ./customPostgresql.conf:/etc/postgresql.conf:Z
