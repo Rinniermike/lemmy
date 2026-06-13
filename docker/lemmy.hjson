@@ -1,26 +1,27 @@
 {
-  # for more info about the config, check out the documentation
-  # https://join-lemmy.org/docs/en/administration/configuration.html
-
-  # This is a minimal lemmy config for the dev / main branch. Do not use for a 
-  # release / stable version.
+  # Chozi instance configuration (Docker dev/local setup)
+  # For full config options: https://join-lemmy.org/docs/en/administration/configuration.html
 
   setup: {
-    admin_username: "lemmy"
-    admin_password: "lemmylemmy"
-    site_name: "lemmy-dev"
-  }
-  database: {
-    connection: "postgres://lemmy:password@postgres:5432/lemmy"
+    admin_username: "chozi_admin"
+    admin_password: "CHANGE_ME_BEFORE_DEPLOY"
+    site_name: "Chozi"
+    admin_email: "admin@chozi.app"
+    # No bootstrap instances — Chozi starts with a clean slate
+    bootstrap_instances: []
   }
 
-  hostname: "localhost"
+  database: {
+    connection: "postgres://chozi:password@postgres:5432/chozi"
+  }
+
+  hostname: "chozi.app"
   bind: "0.0.0.0"
   port: 8536
 
   pictrs: {
     url: "http://pictrs:8080/"
-    api_key: "my-pictrs-key"
+    api_key: "CHANGE_ME_PICTRS_KEY"
   }
 
   #opentelemetry_url: "http://otel:4137"
